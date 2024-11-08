@@ -8,7 +8,7 @@ const db = {
     SalesOrder
 };
 // Sync database models and log success/error messages
-sequelize.sync({ force: true })
+sequelize.sync({ force: false })
     .then(() => console.log("Database & tables synced successfully"))
     .catch((error) => console.error("Error syncing database:", error));
 
