@@ -1,6 +1,6 @@
-const sequelize = require('../config/database');
-const Product = require('./product');
-const SalesOrder = require('./salesOrder');
+const sequelize = require('./config/database');
+const Product = require('./models/product');
+const SalesOrder = require('./models/salesOrder');
 
 const db = {
     Sequelize: sequelize,
