@@ -1,6 +1,7 @@
 const SalesOrder = require('../models/salesOrder');
 const Product = require('../models/product');
 const axios = require('axios');
+const redisClient = require('../config/redisClient');  // Import Redis client
 
 // Create a Sales Order with Product IDs
 exports.createSalesOrder = async (req, res) => {
@@ -41,26 +42,43 @@ exports.createSalesOrder = async (req, res) => {
 // Get All Sales Orders
 exports.getAllSalesOrders = async (req, res) => {
     try {
-        const salesOrders = await SalesOrder.findAll({
-            include: Product  // Include associated products
-        });
+        // Check if sales orders are cached
+        const cachedOrders = await redisClient.get('allSalesOrders');
+        if (cachedOrders) {
+            return res.status(200).json(JSON.parse(cachedOrders));
+        }
+
+        // Fetch sales orders from database if not in cache
+        const salesOrders = await SalesOrder.findAll({ include: Product });
+        await redisClient.setEx('allSalesOrders', 300, JSON.stringify(salesOrders)); // Cache for 5 minutes
+
         res.status(200).json(salesOrders);
     } catch (error) {
         res.status(500).json({ message: 'Error fetching sales orders', error });
     }
 };
 
+
 // Get a Sales Order by ID
 exports.getSalesOrderById = async (req, res) => {
+    const { orderId } = req.params;
+
     try {
-        const order = await SalesOrder.findByPk(req.params.orderId, {
-            include: Product  // Include associated products
-        });
-        if (order) {
-            res.status(200).json(order);
-        } else {
-            res.status(404).json({ message: 'Sales order not found' });
+        // Check if the order is cached in Redis
+        const cachedOrder = await redisClient.get(`order:${orderId}`);
+        if (cachedOrder) {
+            console.log("Redis: result from cache")
+            return res.status(200).json(JSON.parse(cachedOrder));
         }
+
+        // Fetch from database if not cached
+        const order = await SalesOrder.findByPk(orderId, { include: Product });
+        if (!order) return res.status(404).json({ message: 'Sales order not found' });
+
+        // Cache the fetched order in Redis for 10 minutes
+        await redisClient.setEx(`order:${orderId}`, 600, JSON.stringify(order));
+
+        res.status(200).json(order);
     } catch (error) {
         res.status(500).json({ message: 'Error fetching sales order', error });
     }

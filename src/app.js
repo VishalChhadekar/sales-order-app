@@ -3,6 +3,7 @@ const bodyParser = require('body-parser');
 const productRoutes = require('./routes/productRoutes');
 const salesOrderRoutes = require('./routes/salesOrderRoutes');
 const db = require('./models/index.js');
+const redisClient = require('./config/redisClient'); // Redis connection
 const errorHandler = require('./middleware/errorHandler');
 const morgan = require('morgan');
 
