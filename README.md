@@ -1,19 +1,12 @@
+# My Store – Backend
 
----
-
-## Frontend `README.md`
-
-### `frontend/README.md`
-
-```markdown
-# My Store – Frontend
-
-This is the frontend client for the **My Store** e-commerce application, built with **Angular** and styled using **Tailwind CSS**.
+This is the backend server for the **My Store** e-commerce application, built with **Express** and **PostgreSQL**.
 
 ## Table of Contents
 - [Setup](#setup)
 - [Usage](#usage)
 - [Deployment](#deployment)
+- [API Endpoints](#api-endpoints)
 - [Technologies Used](#technologies-used)
 
 ---
@@ -23,19 +16,16 @@ This is the frontend client for the **My Store** e-commerce application, built w
 ### Prerequisites
 
 - [Node.js](https://nodejs.org/) and [npm](https://npmjs.com/)
-- Angular CLI:
-
-    ```bash
-    npm install -g @angular/cli
-    ```
+- PostgreSQL database credentials
+- Redis instance for caching
 
 ### Installation
 
 1. Clone the repository:
 
     ```bash
-    git clone <frontend-repo-url>
-    cd frontend
+    git clone <backend-repo-url>
+    cd backend
     ```
 
 2. Install dependencies:
@@ -44,28 +34,34 @@ This is the frontend client for the **My Store** e-commerce application, built w
     npm install
     ```
 
-3. Create `src/environments/environment.ts` for development environment:
+3. Create a `.env` file in the root directory:
 
-    ```typescript
-    export const environment = {
-      production: false,
-      apiUrl: 'http://localhost:3000/api'
-    };
+    ```plaintext
+    PORT=3000
+    DATABASE_URL=your_database_url
+    REDIS_URL=your_redis_url
     ```
 
-4. Run the frontend application:
+4. Run migrations and seed data (if any):
 
     ```bash
-    ng serve
+    npx sequelize-cli db:migrate
+    npx sequelize-cli db:seed:all
     ```
 
-The frontend should be accessible at `http://localhost:4200`.
+5. Start the server:
+
+    ```bash
+    npm start
+    ```
+
+The backend server should be running at `http://localhost:3000`.
 
 ---
 
 ## Usage
 
-To start the Angular development server:
+To run the server:
 
 ```bash
-ng serve
+npm start
