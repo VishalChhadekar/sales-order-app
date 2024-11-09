@@ -133,4 +133,4 @@ To deploy the backend on **Render**, **Heroku**, or similar platforms:
 **Get All Products**
 
 ```bash
-curl -X GET "https://orderease-sll9.onrender.com/api/products"
+curl -X GET "https://orderease-sll9.onrender.com/api/internal/products"
