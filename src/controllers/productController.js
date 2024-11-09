@@ -4,8 +4,12 @@ const redisClient = require('../config/redisClient');  // Import Redis client
 // Create a Product
 exports.createProduct = async (req, res) => {
     try {
-        const { product_name, price } = req.body;
-        const product = await Product.create({ product_name, price });
+        const { product_name, price, image_url } = req.body;
+        const product = await Product.create({ product_name, price, image_url });
+
+        // Clear the cache for all products list so that it fetches updated data on the next request
+        await redisClient.del('allProducts');
+
         res.status(201).json(product);
     } catch (error) {
         res.status(500).json({ message: 'Error creating product', error });
@@ -60,12 +64,20 @@ exports.getProductById = async (req, res) => {
 // Update a Product by ID
 exports.updateProduct = async (req, res) => {
     try {
-        const { product_name, price } = req.body;
+        const { product_name, price, image_url } = req.body;  // Include image_url if it can be updated
         const product = await Product.findByPk(req.params.productId);
+
         if (product) {
             product.product_name = product_name || product.product_name;
             product.price = price || product.price;
+            product.image_url = image_url || product.image_url;  // Update image_url if provided
+
             await product.save();
+
+            // Clear cache for the updated product and the allProducts list
+            await redisClient.del(`product:${req.params.productId}`);
+            await redisClient.del('allProducts');
+
             res.status(200).json(product);
         } else {
             res.status(404).json({ message: 'Product not found' });
@@ -79,8 +91,14 @@ exports.updateProduct = async (req, res) => {
 exports.deleteProduct = async (req, res) => {
     try {
         const product = await Product.findByPk(req.params.productId);
+
         if (product) {
             await product.destroy();
+
+            // Clear cache for the deleted product and the allProducts list
+            await redisClient.del(`product:${req.params.productId}`);
+            await redisClient.del('allProducts');
+
             res.status(200).json({ message: 'Product deleted successfully' });
         } else {
             res.status(404).json({ message: 'Product not found' });

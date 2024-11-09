@@ -59,6 +59,33 @@ exports.getAllSalesOrders = async (req, res) => {
 };
 
 
+// Get all sales orders with optional filters
+exports.getSalesOrders = async (req, res) => {
+    try {
+        // Extract query parameters for filtering
+        const { name, email, mobileNumber, status, orderDate } = req.query;
+
+        // Build the filter object dynamically
+        const filters = {};
+        if (name) filters.customer_name = { [Op.like]: `%${name}%` };
+        if (email) filters.email = { [Op.like]: `%${email}%` };
+        if (mobileNumber) filters.mobile_number = { [Op.like]: `%${mobileNumber}%` };
+        if (status) filters.status = { [Op.eq]: status };
+        if (orderDate) filters.order_date = { [Op.eq]: new Date(orderDate) };
+
+        // Fetch orders with filters applied
+        const salesOrders = await SalesOrder.findAll({
+            where: filters,
+        });
+
+        res.status(200).json(salesOrders);
+    } catch (error) {
+        console.error('Error fetching sales orders:', error);
+        res.status(500).json({ message: 'Error fetching sales orders', error });
+    }
+};
+
+
 // Get a Sales Order by ID
 exports.getSalesOrderById = async (req, res) => {
     const { orderId } = req.params;

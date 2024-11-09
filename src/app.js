@@ -11,7 +11,7 @@ const app = express();
 const cors = require('cors');
 
 app.use(cors({
-    origin: 'http://localhost:4200', // Replace this with frontend domain
+    origin: ['https://order-ezze.vercel.app', 'http://localhost:4200'], // Replace this with frontend domain
     methods: 'GET,POST,PUT,DELETE',
     credentials: true,
 }));

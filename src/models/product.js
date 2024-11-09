@@ -5,6 +5,7 @@ const Product = sequelize.define('Product', {
     product_id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
     product_name: { type: DataTypes.STRING, allowNull: false },
     price: { type: DataTypes.FLOAT, allowNull: false },
+    image_url: { type: DataTypes.STRING, allowNull: true }
 }, {
     timestamps: false,
     tableName: 'Products'  // Explicit table name to avoid discrepancies
